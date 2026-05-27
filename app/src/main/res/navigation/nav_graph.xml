@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.projetofinal.HomeFragment"
+        android:label="Remédios"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/cadastroFragment"
+        android:name="com.example.projetofinal.CadastroFragment"
+        android:label="Cadastrar"
+        tools:layout="@layout/fragment_cadastro" />
+
+    <fragment
+        android:id="@+id/perfilFragment"
+        android:name="com.example.projetofinal.PerfilFragment"
+        android:label="Perfil"
+        tools:layout="@layout/fragment_perfil_" />
+
+    <fragment
+        android:id="@+id/detalhesFragment"
+        android:name="com.example.projetofinal.DetalhesFragment"
+        android:label="Detalhes"
+        tools:layout="@layout/fragment_detalhes" />
+
+</navigation>

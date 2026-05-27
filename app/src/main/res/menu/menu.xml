@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Remédios" />
+
+    <item
+        android:id="@+id/cadastroFragment"
+        android:icon="@android:drawable/ic_input_add"
+        android:title="Cadastrar" />
+
+    <item
+        android:id="@+id/perfilFragment"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Perfil" />
+
+</menu>
