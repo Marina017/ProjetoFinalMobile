@@ -1,64 +1,80 @@
 package com.example.projetofinal;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import java.util.List;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PerfilFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PerfilFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public PerfilFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Perfil_Fragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PerfilFragment newInstance(String param1, String param2) {
-        PerfilFragment fragment = new PerfilFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private TextView txtNomeUsuario, txtSubtituloUsuario, txtQtdRemedios;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_perfil_, container, false);
+        return inflater.inflate(R.layout.fragment_perfil, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Vincula os componentes do XML
+        txtNomeUsuario = view.findViewById(R.id.txtNomeUsuario);
+        txtSubtituloUsuario = view.findViewById(R.id.txtSubtituloUsuario);
+        txtQtdRemedios = view.findViewById(R.id.txtQtdRemedios);
+
+        // Carrega os dados reais do usuário logado
+        carregarDadosDoUsuarioLogado();
+
+        // Puxa as estatísticas de remédios do banco
+        obterEstatisticasDoBanco();
+    }
+
+    private void carregarDadosDoUsuarioLogado() {
+        if (getContext() != null) {
+            // Abre o arquivo de sessão local chamado "SessaoUsuario"
+            SharedPreferences preferences = getContext().getSharedPreferences("SessaoUsuario", Context.MODE_PRIVATE);
+
+            // Busca as strings gravadas. Se não encontrar nada, exibe valores padrão
+            String nome = preferences.getString("nome_usuario", "Usuário");
+            String email = preferences.getString("email_usuario", "não-identificado@email.com");
+
+            // Aplica os dados do banco nos TextViews correspondentes
+            txtNomeUsuario.setText(nome);
+            txtSubtituloUsuario.setText(email);
+        }
+    }
+
+    private void obterEstatisticasDoBanco() {
+        RemedioService service = RetrofitClient.getClient().create(RemedioService.class);
+        Call<List<Remedio>> call = service.listarRemedios();
+
+        call.enqueue(new Callback<List<Remedio>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Remedio>> call, @NonNull Response<List<Remedio>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    int total = response.body().size();
+                    txtQtdRemedios.setText(String.valueOf(total));
+                } else {
+                    txtQtdRemedios.setText("0");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Remedio>> call, @NonNull Throwable t) {
+                txtQtdRemedios.setText("?");
+            }
+        });
     }
 }

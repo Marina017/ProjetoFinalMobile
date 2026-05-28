@@ -1,64 +1,90 @@
 package com.example.projetofinal;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CadastroFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CadastroFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public CadastroFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Cadastro_Fragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CadastroFragment newInstance(String param1, String param2) {
-        CadastroFragment fragment = new CadastroFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    // Declaração dos componentes da tela (Views)
+    private EditText editNome, editLaboratorio, editCategoria, editDosagem, editDescricao;
+    private Button btnCadastrar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Infla o layout do formulário de cadastro
         return inflater.inflate(R.layout.fragment_cadastro, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // 1. Vincula os componentes Java com os IDs do seu fragment_cadastro.xml
+        // ⚠️ ATENÇÃO: Se os IDs no seu XML forem diferentes, mude os nomes dentro do R.id.xxxx
+        editNome = view.findViewById(R.id.editNome);
+        editLaboratorio = view.findViewById(R.id.editLaboratorio);
+        editCategoria = view.findViewById(R.id.editCategoria);
+        editDosagem = view.findViewById(R.id.editDosagem);
+        editDescricao = view.findViewById(R.id.editDescricao);
+        btnCadastrar = view.findViewById(R.id.btnCadastrar);
+
+        // 2. Configura o clique do botão de cadastrar
+        btnCadastrar.setOnClickListener(v -> cadastrarNovoRemedio(v));
+    }
+
+    private void cadastrarNovoRemedio(View view) {
+        // Captura os textos digitados pelo usuário
+        String nome = editNome.getText().toString().trim();
+        String laboratorio = editLaboratorio.getText().toString().trim();
+        String categoria = editCategoria.getText().toString().trim();
+        String dosagem = editDosagem.getText().toString().trim();
+        String descricao = editDescricao.getText().toString().trim();
+
+        // 3. Validação básica local (evita enviar dados vazios e gastar processamento da API)
+        if (nome.isEmpty() || laboratorio.isEmpty() || categoria.isEmpty() || dosagem.isEmpty() || descricao.isEmpty()) {
+            Toast.makeText(getContext(), "Por favor, preencha todos os campos obrigatórios!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 4. Cria o objeto Remedio com os dados da tela (definindo imagem padrão como 0 temporariamente)
+        Remedio novoRemedio = new Remedio(nome, laboratorio, categoria, descricao, dosagem, 0);
+
+        // 5. Inicializa o Retrofit e prepara a chamada POST
+        RemedioService service = RetrofitClient.getClient().create(RemedioService.class);
+        Call<RemedioResponse> call = service.cadastrarRemedio(novoRemedio);
+
+        // Envia de forma assíncrona para o Railway
+        call.enqueue(new Callback<RemedioResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<RemedioResponse> call, @NonNull Response<RemedioResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String mensagemBackend = response.body().getMensagem();
+                    Toast.makeText(CadastroFragment.this.getContext(), mensagemBackend, Toast.LENGTH_SHORT).show();
+
+                    Navigation.findNavController(view).navigateUp();
+                } else {
+                    Toast.makeText(CadastroFragment.this.getContext(), "Erro ao cadastrar: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<RemedioResponse> call, @NonNull Throwable t) {
+                Toast.makeText(CadastroFragment.this.getContext(), "Erro de conexão: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

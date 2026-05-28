@@ -37,7 +37,7 @@ public class RemedioAdapter extends RecyclerView.Adapter<RemedioAdapter.ViewHold
         holder.txtNome.setText(remedio.getNome());
         holder.txtCategoria.setText(remedio.getCategoria());
         holder.txtDescricao.setText(remedio.getDescricao());
-        holder.imgRemedio.setImageResource(remedio.getImagemResId());
+        holder.imgRemedio.setImageResource(remedio.getImagem());
         holder.itemView.setOnClickListener(v -> listener.onItemClick(remedio));
     }
 

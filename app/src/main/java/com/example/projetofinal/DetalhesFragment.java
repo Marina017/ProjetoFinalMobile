@@ -1,64 +1,90 @@
 package com.example.projetofinal;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link DetalhesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class DetalhesFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public DetalhesFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Detalhes_Fragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DetalhesFragment newInstance(String param1, String param2) {
-        DetalhesFragment fragment = new DetalhesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private TextView txtNome, txtLaboratorio, txtCategoria, txtDosagem, txtDescricao;
+    private ImageView imgRemedio;
+    private int remedioId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Infla o layout da tela de detalhes
         return inflater.inflate(R.layout.fragment_detalhes, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // 1. Vincula os componentes do XML fragment_detalhes
+        // ⚠️ Verifique se esses IDs batem com o seu arquivo XML!
+        txtNome = view.findViewById(R.id.txtNomeDetalhe);
+        txtLaboratorio = view.findViewById(R.id.txtLaboratorioDetalhe);
+        txtCategoria = view.findViewById(R.id.txtCategoriaDetalhe);
+        txtDosagem = view.findViewById(R.id.txtDosagemDetalhe);
+        txtDescricao = view.findViewById(R.id.txtDescricaoDetalhe);
+        imgRemedio = view.findViewById(R.id.imgRemedioDetalhe);
+
+        // 2. Recupera o ID do remédio enviado pela HomeFragment
+        if (getArguments() != null) {
+            remedioId = getArguments().getInt("remedioId", -1);
+        }
+
+        // 3. Se o ID for válido, busca as informações atualizadas na API
+        if (remedioId != -1) {
+            carregarDetalhesDoRemedio();
+        } else {
+            Toast.makeText(getContext(), "Erro ao carregar dados do remédio", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void carregarDetalhesDoRemedio() {
+        RemedioService service = RetrofitClient.getClient().create(RemedioService.class);
+        Call<Remedio> call = service.buscarPorId(remedioId);
+
+        call.enqueue(new Callback<Remedio>() {
+            @Override
+            public void onResponse(@NonNull Call<Remedio> call, @NonNull Response<Remedio> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Remedio remedio = response.body();
+
+                    // 4. Preenche a tela com os dados vindos direto do MySQL
+                    txtNome.setText(remedio.getNome());
+                    txtLaboratorio.setText(remedio.getLaboratorio());
+                    txtCategoria.setText(remedio.getCategoria());
+                    txtDosagem.setText(remedio.getDosagem());
+                    txtDescricao.setText(remedio.getDescricao());
+
+                    // Se a imagem for 0, você pode setar uma padrão do sistema
+                    if (remedio.getImagem() != 0) {
+                        imgRemedio.setImageResource(remedio.getImagem());
+                    } else {
+                        imgRemedio.setImageResource(android.R.drawable.ic_menu_help);
+                    }
+                } else {
+                    Toast.makeText(DetalhesFragment.this.getContext(), "Remédio não encontrado", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Remedio> call, @NonNull Throwable t) {
+                Toast.makeText(DetalhesFragment.this.getContext(), "Erro de conexão: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

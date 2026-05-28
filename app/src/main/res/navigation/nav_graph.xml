@@ -21,7 +21,7 @@
         android:id="@+id/perfilFragment"
         android:name="com.example.projetofinal.PerfilFragment"
         android:label="Perfil"
-        tools:layout="@layout/fragment_perfil_" />
+        tools:layout="@layout/fragment_perfil" />
 
     <fragment
         android:id="@+id/detalhesFragment"
