@@ -1,5 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ProjetoFinal</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Textos do Perfil -->
+    <string name="foto_perfil">Foto de Perfil</string>
+    <string name="email">Email</string>
+    <string name="telefone">Telefone</string>
+    <string name="localizacao">Localização</string>
+
+    <!-- Botões -->
+    <string name="editar_perfil">Editar Perfil</string>
+    <string name="alterar_senha">Alterar Senha</string>
+    <string name="sair">Sair</string>
+
+    <!-- Icons descriptions -->
+    <string name="ic_email">Ícone de Email</string>
+    <string name="ic_phone">Ícone de Telefone</string>
+    <string name="ic_location">Ícone de Localização</string>
 </resources>
