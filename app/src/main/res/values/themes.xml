@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.ProjetoFinal" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#1976D2</item>
-        <item name="colorPrimaryDark">#1565C0</item>
-        <item name="colorAccent">#43A047</item>
-    </style>
+        <!-- Verde principal (botões, toolbar, destaques) -->
+        <item name="colorPrimary">#2E7D32</item>
+        <item name="colorPrimaryDark">#1B5E20</item>
+        <item name="colorPrimaryVariant">#1B5E20</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
 
+        <!-- Verde secundário (acentos, elementos de apoio) -->
+        <item name="colorSecondary">#43A047</item>
+        <item name="colorSecondaryVariant">#388E3C</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+
+        <!-- Acento mais vivo -->
+        <item name="colorAccent">#66BB6A</item>
+
+        <!-- Fundo geral e superfícies -->
+        <item name="android:colorBackground">#F2FBF5</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnBackground">#1B1B1B</item>
+        <item name="colorOnSurface">#1B1B1B</item>
+
+        <!-- Barra de status -->
+        <item name="android:statusBarColor">#1B5E20</item>
+    </style>
 
 </resources>

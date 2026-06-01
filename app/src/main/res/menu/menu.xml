@@ -3,8 +3,9 @@
 
     <item
         android:id="@+id/homeFragment"
-        android:icon="@android:drawable/ic_menu_agenda"
-        android:title="Remédios" />
+        android:icon="@drawable/icone_home"
+        android:title="Home" />
+
 
     <item
         android:id="@+id/cadastroFragment"
@@ -13,7 +14,8 @@
 
     <item
         android:id="@+id/perfilFragment"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/icone_perfil"
         android:title="Perfil" />
+
 
 </menu>

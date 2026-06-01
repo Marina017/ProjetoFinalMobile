@@ -15,4 +15,6 @@
     <string name="ic_email">Ícone de Email</string>
     <string name="ic_phone">Ícone de Telefone</string>
     <string name="ic_location">Ícone de Localização</string>
+
+    <string name="app_name">ProjetoFinal</string>
 </resources>
