@@ -1,6 +1,7 @@
 package com.example.projetofinal;
 
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,23 +38,39 @@ public class LoginFragment extends Fragment {
             String usuario = inputUsuario.getText() != null ? inputUsuario.getText().toString().trim() : "";
             String senha = inputSenha.getText() != null ? inputSenha.getText().toString().trim() : "";
 
+            // Campos vazios
             if (usuario.isEmpty() || senha.isEmpty()) {
-                Toast.makeText(requireContext(), "Preencha usuário e senha", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Preencha email e senha", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (validarLogin(usuario, senha)) {
-                NavHostFragment.findNavController(LoginFragment.this)
-                        .navigate(R.id.action_login_to_home);
-            } else {
-                Toast.makeText(requireContext(), "Usuário ou senha inválidos", Toast.LENGTH_SHORT).show();
+            // Valida o email
+            if (!emailValido(usuario)) {
+                inputUsuario.setError("Digite um email válido");
+                inputUsuario.requestFocus();
+                return;
             }
+
+            // Valida a senha (exatamente 5 números)
+            if (!senhaValida(senha)) {
+                inputSenha.setError("A senha deve ter exatamente 5 números");
+                inputSenha.requestFocus();
+                return;
+            }
+
+            // Tudo certo: entra no app
+            NavHostFragment.findNavController(LoginFragment.this)
+                    .navigate(R.id.action_login_to_home);
         });
     }
 
-    // ===== Por enquanto: validação fixa =====
-    // Quando tiver backend, troque APENAS este método pela chamada à API.
-    private boolean validarLogin(String usuario, String senha) {
-        return usuario.equals("admin") && senha.equals("1234");
+    // Verifica se o texto é um email válido
+    private boolean emailValido(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    // Verifica se a senha tem exatamente 5 dígitos numéricos
+    private boolean senhaValida(String senha) {
+        return senha.matches("\\d{5}");
     }
 }
