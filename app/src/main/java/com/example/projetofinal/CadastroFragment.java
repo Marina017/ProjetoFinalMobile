@@ -15,7 +15,8 @@ import com.google.android.material.textfield.TextInputEditText;
 
 public class CadastroFragment extends Fragment {
 
-    private TextInputEditText editNome, editDosagem, editQuantidade, editObservacoes;
+    private TextInputEditText editNome, editDosagem, editQuantidade,
+            editPreco, editDescricao, editQuandoTomar, editContraindicacoes, editObservacoes;
     private AutoCompleteTextView spinnerTipo;
     private MaterialButton btnSalvar;
 
@@ -34,12 +35,16 @@ public class CadastroFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        editNome        = view.findViewById(R.id.editNome);
-        editDosagem     = view.findViewById(R.id.editDosagem);
-        editQuantidade  = view.findViewById(R.id.editQuantidade);
-        editObservacoes = view.findViewById(R.id.editObservacoes);
-        spinnerTipo     = view.findViewById(R.id.spinnerTipo);
-        btnSalvar       = view.findViewById(R.id.btnSalvar);
+        editNome             = view.findViewById(R.id.editNome);
+        editDosagem          = view.findViewById(R.id.editDosagem);
+        editQuantidade       = view.findViewById(R.id.editQuantidade);
+        editPreco            = view.findViewById(R.id.editPreco);
+        editDescricao        = view.findViewById(R.id.editDescricao);
+        editQuandoTomar      = view.findViewById(R.id.editQuandoTomar);
+        editContraindicacoes = view.findViewById(R.id.editContraindicacoes);
+        editObservacoes      = view.findViewById(R.id.editObservacoes);
+        spinnerTipo          = view.findViewById(R.id.spinnerTipo);
+        btnSalvar            = view.findViewById(R.id.btnSalvar);
 
         // Preenche o dropdown de tipos
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -52,12 +57,20 @@ public class CadastroFragment extends Fragment {
         btnSalvar.setOnClickListener(v -> salvarRemedio());
     }
 
+    private String texto(TextInputEditText campo) {
+        return campo.getText() != null ? campo.getText().toString().trim() : "";
+    }
+
     private void salvarRemedio() {
-        String nome       = editNome.getText() != null ? editNome.getText().toString().trim() : "";
-        String dosagem    = editDosagem.getText() != null ? editDosagem.getText().toString().trim() : "";
-        String quantidade = editQuantidade.getText() != null ? editQuantidade.getText().toString().trim() : "";
-        String tipo       = spinnerTipo.getText() != null ? spinnerTipo.getText().toString().trim() : "";
-        String obs        = editObservacoes.getText() != null ? editObservacoes.getText().toString().trim() : "";
+        String nome             = texto(editNome);
+        String dosagem          = texto(editDosagem);
+        String quantidade       = texto(editQuantidade);
+        String preco            = texto(editPreco);
+        String descricao        = texto(editDescricao);
+        String quandoTomar      = texto(editQuandoTomar);
+        String contraindicacoes = texto(editContraindicacoes);
+        String obs              = texto(editObservacoes);
+        String tipo             = spinnerTipo.getText() != null ? spinnerTipo.getText().toString().trim() : "";
 
         // Validação dos campos obrigatórios
         if (nome.isEmpty()) {
@@ -81,10 +94,25 @@ public class CadastroFragment extends Fragment {
             return;
         }
 
-        // Por enquanto apenas exibe confirmação
-        // Aqui você conectará ao Room ou Firebase futuramente
-        String mensagem = "Remédio \"" + nome + "\" cadastrado com sucesso!";
-        Toast.makeText(requireContext(), mensagem, Toast.LENGTH_SHORT).show();
+        // Cria o remédio com todas as informações do card
+        int icone = android.R.drawable.ic_menu_help;
+
+        Remedio novo = new Remedio(
+                nome,
+                tipo,
+                descricao.isEmpty() ? "Sem descrição" : descricao,
+                icone,
+                quantidade + " unidade(s)",
+                preco.isEmpty() ? "—" : "R$ " + preco,
+                contraindicacoes.isEmpty() ? "—" : contraindicacoes,
+                quandoTomar.isEmpty() ? ("Dosagem: " + dosagem + " mg") : quandoTomar
+        );
+
+        RemedioRepository.adicionar(novo);
+
+        Toast.makeText(requireContext(),
+                "Remédio \"" + nome + "\" cadastrado com sucesso!",
+                Toast.LENGTH_SHORT).show();
 
         limparCampos();
     }
@@ -93,6 +121,10 @@ public class CadastroFragment extends Fragment {
         editNome.setText("");
         editDosagem.setText("");
         editQuantidade.setText("");
+        editPreco.setText("");
+        editDescricao.setText("");
+        editQuandoTomar.setText("");
+        editContraindicacoes.setText("");
         editObservacoes.setText("");
         spinnerTipo.setText("", false);
     }
